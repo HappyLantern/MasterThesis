@@ -3,7 +3,7 @@ import json
 from fiona import collection
 from shapely import geometry
 
-with open('sthlm.geojson', encoding="utf-8") as f:
+with open('sthlmpark.geojson', encoding="utf-8") as f:
     data =  json.load(f)
 coords = data['features'][0]['geometry']['coordinates']
 
