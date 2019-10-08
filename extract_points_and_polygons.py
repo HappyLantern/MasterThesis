@@ -3,7 +3,7 @@ import json
 from fiona import collection
 from shapely import geometry
 
-with open('sthlmpark.geojson', encoding="utf-8") as f:
+with open('shapefiles etc/sthlmpark.geojson', encoding="utf-8") as f:
     data =  json.load(f)
 coords = data['features'][0]['geometry']['coordinates']
 
@@ -36,7 +36,8 @@ with collection(
                     point = geometry.Point(float(p[0]), float(p[1]))
                     pointout.write({
                         'properties': {
-                            'name': a
+                            'name': a,
+                            'class': 'parking lot'
                         },
                         'geometry'  : geometry.mapping(point)
                 })
