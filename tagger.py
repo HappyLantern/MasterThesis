@@ -56,6 +56,7 @@ def main(argv):
 
    width = (east-west)/width_tiles
    height = (south-north)/height_tiles
+                        # för sthlm
                         # x-led 18.25367104 - 17.959218298 = 0.294452742
                         # 0.00188751758 per ruta
                         # y-led 59.362344447 - 59.234034854 = 0.128309593
@@ -70,9 +71,10 @@ def main(argv):
            shapes.append(shp)
    print("Tagging tiles...")
 
-   for i in range(floor(width_tiles)):
+   print(width_tiles, height_tiles)
+   for i in range(floor(height_tiles)):
        x = west
-       for j in range(floor(height_tiles)):
+       for j in range(floor(width_tiles)):
 
            has_parking_lot = 0
            coords = [(x,y), (x,y+height), (x+width, y+height), (x+width, y), (x,y)]
@@ -80,17 +82,18 @@ def main(argv):
            tile = geometry.shape(geom)
 
            for shp in shapes:
-               if not shp.disjoint(tile):
+               intersect = shp.intersection(tile)
+               if not shp.disjoint(tile) and intersect.area/shp.area > 0.5:
+                   # kollar nu andelen av en viss parkeringsruta är i en tile
+                   # borde kolla hur mycket av tilen är täckt, kanske?
                    has_parking_lot = 1
-                   # print(i*156+j, i, j )
-                   tagfile.write(str(i*floor(width_tiles)+j) + " " + str(has_parking_lot) + "\n")
                    break
 
-               #print(geometry.shape(point['geometry']), point['properties']
-           tagfile.write(str(i*floor(width_tiles)+j) + " " + str(has_parking_lot) + "\n")
+
+           tagfile.write(str(has_parking_lot) + "\n")
            x += width
        y += height
 
 
 if __name__ == "__main__":
-   inputfile = main(sys.argv[1:])
+   main(sys.argv[1:])

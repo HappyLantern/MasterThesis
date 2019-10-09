@@ -1,6 +1,6 @@
-Satellite image = satellite images/sthlmgreynew.tif
+Satellite image = ../satellite images/sthlmgreynew.tif
 Tile size = 256
 Problemtype = binary
 Output path = parktags.txt
 Classes: 1
-One : Parking lot, filepath=shapefiles etc/sthlmpoly.shp
+One : Parking lot, filepath=../shapefiles etc/sthlmpoly.shp
