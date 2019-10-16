@@ -2,10 +2,11 @@ import rasterio
 import rasterio.features
 from fiona import collection
 from shapely import geometry
+from shapely.strtree import STRtree
 import os
 from math import floor
 import sys, getopt
-
+import shutil
 def main(argv):
    inputfile = "config.txt"
    try:
@@ -27,15 +28,26 @@ def main(argv):
        lines = content
        sat_path = lines[0][18:-1] # -1 skips newline
        tile_pixels = lines[1][12:-1]
-       classtype = lines[2][14:-1]
-       output_path = lines[3][14:-1]
-       if classtype != "binary":
-           pass
-           #TODO då ska vi läsa hur många klasser som finns, och hantera alla olika shapefiles osv
-       else:
-           line = lines[5].split(',')
-           classname = line[0][6:]
+       tile_path = lines[2][12:-1]
+       tile_prefix = lines[3][14:-1]
+       classtype = lines[4][14:-1]
+       output_path = lines[5][14:-1]
+       nr_of_classes = int(lines[6][9:-1])
+       print("Reading shapefiles...")
+       trees = []
+       if not os.path.isdir(output_path+"/Untaggeds"):
+           os.mkdir(output_path + "/Untaggeds")
+       for i in range(nr_of_classes):
+           line = lines[7+i].split(',')
+           classname = line[0]
            shape_path = line[1][10:-1]
+           if not os.path.isdir(output_path+"/"+classname):
+               os.mkdir(output_path+"/"+classname)
+           shp = []
+           with collection(shape_path, "r") as input:
+               for point in input:
+                   shp.append(geometry.shape(point['geometry']))
+           trees.append(STRtree(shp))
 
    print("Reading satellite data...")
    with rasterio.open(sat_path) as fullsat:
@@ -52,7 +64,6 @@ def main(argv):
 
    width_tiles = sat_width/int(tile_pixels)
    height_tiles = sat_height/int(tile_pixels)
-   tagfile = open(output_path, 'w')
 
    width = (east-west)/width_tiles
    height = (south-north)/height_tiles
@@ -63,37 +74,47 @@ def main(argv):
                         # 0.00188690578 per ruta
    x = west
    y = north
-   shapes = []
-   print("Reading shapefiles...")
-   with collection(shape_path, "r") as input:
-       for point in input:
-           shp = geometry.shape(point['geometry'])
-           shapes.append(shp)
    print("Tagging tiles...")
-
-   print(width_tiles, height_tiles)
    for i in range(floor(height_tiles)):
        x = west
        for j in range(floor(width_tiles)):
+           for k in range(nr_of_classes):
+               has_class = 0
+               coords = [(x,y), (x,y+height), (x+width, y+height), (x+width, y), (x,y)]
+               geom = {'type' : 'Polygon', 'coordinates': [coords]}
+               tile = geometry.shape(geom)
+               tree = trees[k]
+               res = tree.query(tile)
+               if res:
+                   has_class = 1
 
-           has_parking_lot = 0
-           coords = [(x,y), (x,y+height), (x+width, y+height), (x+width, y), (x,y)]
-           geom = {'type' : 'Polygon', 'coordinates': [coords]}
-           tile = geometry.shape(geom)
+               """
+               for shp in shapes[k]:
+                   #intersect = shp.intersection(tile)
+                   if not shp.disjoint(tile):# and intersect.area/shp.area > 0.5:
+                       # kollar nu andelen av en viss parkeringsruta är i en tile
+                       # borde kolla hur mycket av tilen är täckt, kanske?
 
-           for shp in shapes:
-               #intersect = shp.intersection(tile)
-               if not shp.disjoint(tile):# and intersect.area/shp.area > 0.5:
-                   # kollar nu andelen av en viss parkeringsruta är i en tile
-                   # borde kolla hur mycket av tilen är täckt, kanske?
-                   has_parking_lot = 1
-                   break
+                       # todo: flera olika shapes kan vara i samma tile, summera?
+                       # Bestäm hur vi gör om flera klasser taggar samma tile.
+
+                       has_class = 1
+                       break
+               """
+
+               if has_class == 1:
+                   shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
+                        + j) + ".tif", output_path + "/" + classname + "/"
+                        + classname.lower()[:-1] + "." + str(round(width_tiles)*i + j) + ".tif")
+               else:
+                   shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
+                        + j) + ".tif", output_path + "/Untaggeds/"
+                        + classname.lower()[:-1] + "." + str(round(width_tiles)*i + j) + ".tif")
 
 
-           tagfile.write(str(has_parking_lot) + "\n")
            x += width
        y += height
-
+       print(i)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
