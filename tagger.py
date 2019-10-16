@@ -35,11 +35,13 @@ def main(argv):
        nr_of_classes = int(lines[6][9:-1])
        print("Reading shapefiles...")
        trees = []
+       classnames = []
        if not os.path.isdir(output_path+"/Untaggeds"):
            os.mkdir(output_path + "/Untaggeds")
        for i in range(nr_of_classes):
            line = lines[7+i].split(',')
            classname = line[0]
+           classnames.append(classname)
            shape_path = line[1][10:-1]
            if not os.path.isdir(output_path+"/"+classname):
                os.mkdir(output_path+"/"+classname)
@@ -48,7 +50,6 @@ def main(argv):
                for point in input:
                    shp.append(geometry.shape(point['geometry']))
            trees.append(STRtree(shp))
-
    print("Reading satellite data...")
    with rasterio.open(sat_path) as fullsat:
        sat_width = fullsat.width
@@ -75,46 +76,53 @@ def main(argv):
    x = west
    y = north
    print("Tagging tiles...")
+
    for i in range(floor(height_tiles)):
        x = west
        for j in range(floor(width_tiles)):
+           coords = [(x,y), (x,y+height), (x+width, y+height), (x+width, y), (x,y)]
+           geom = {'type' : 'Polygon', 'coordinates': [coords]}
+           tile = geometry.shape(geom)
+           areas = []
+           has_class = 0
            for k in range(nr_of_classes):
-               has_class = 0
-               coords = [(x,y), (x,y+height), (x+width, y+height), (x+width, y), (x,y)]
-               geom = {'type' : 'Polygon', 'coordinates': [coords]}
-               tile = geometry.shape(geom)
                tree = trees[k]
                res = tree.query(tile)
-               if res:
+               area = 0
+               for s in res:
                    has_class = 1
-
-               """
-               for shp in shapes[k]:
-                   #intersect = shp.intersection(tile)
-                   if not shp.disjoint(tile):# and intersect.area/shp.area > 0.5:
-                       # kollar nu andelen av en viss parkeringsruta är i en tile
-                       # borde kolla hur mycket av tilen är täckt, kanske?
-
-                       # todo: flera olika shapes kan vara i samma tile, summera?
-                       # Bestäm hur vi gör om flera klasser taggar samma tile.
-
-                       has_class = 1
-                       break
-               """
-
-               if has_class == 1:
-                   shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
-                        + j) + ".tif", output_path + "/" + classname + "/"
-                        + classname.lower()[:-1] + "." + str(round(width_tiles)*i + j) + ".tif")
-               else:
-                   shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
-                        + j) + ".tif", output_path + "/Untaggeds/"
-                        + classname.lower()[:-1] + "." + str(round(width_tiles)*i + j) + ".tif")
-
-
+                   try:
+                       area += s.intersection(tile).area
+                       # hanterar inte om flera shapes överlappar, det är dock doable
+                   except Exception as e:
+                       s = s.buffer(0)
+                       area += s.intersection(tile).area
+               areas.append(area)
+           if has_class == 1:
+               index_max = max(range(len(areas)), key=areas.__getitem__)
+               shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
+                    + j) + ".tif", output_path + "/" + classnames[index_max] + "/"
+                    + classnames[index_max].lower()[:-1] + "." + str(round(width_tiles)*i + j) + ".tif")
+           else:
+               shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
+                    + j) + ".tif", output_path + "/Untaggeds/untagged." +
+                    str(round(width_tiles)*i + j) + ".tif")
            x += width
        y += height
        print(i)
 
+"""
+for shp in shapes[k]:
+   #intersect = shp.intersection(tile)
+   if not shp.disjoint(tile):# and intersect.area/shp.area > 0.5:
+       # kollar nu andelen av en viss parkeringsruta är i en tile
+       # borde kolla hur mycket av tilen är täckt, kanske?
+
+       # todo: flera olika shapes kan vara i samma tile, summera?
+       # Bestäm hur vi gör om flera klasser taggar samma tile.
+
+       has_class = 1
+       break
+"""
 if __name__ == "__main__":
    main(sys.argv[1:])
