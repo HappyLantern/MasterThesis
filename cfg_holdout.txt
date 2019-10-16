@@ -1,0 +1,9 @@
+Source: C:/Users/A552081/MasterThesis/MSData/orig_data_test
+Destination: C:/Users/A552081/MasterThesis/MSData/test_for_generator
+Splitratio: 60/20/20
+Classes: 4
+Houses
+Trees
+Parkinglots
+Parks
+
