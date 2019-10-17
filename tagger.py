@@ -36,10 +36,12 @@ def main(argv):
        print("Reading shapefiles...")
        trees = []
        classnames = []
+       class_indices = []
        if not os.path.isdir(output_path+"/Untaggeds"):
            os.mkdir(output_path + "/Untaggeds")
        for i in range(nr_of_classes):
            line = lines[7+i].split(',')
+           class_indices.append(0)
            classname = line[0]
            classnames.append(classname)
            shape_path = line[1][10:-1]
@@ -50,6 +52,7 @@ def main(argv):
                for point in input:
                    shp.append(geometry.shape(point['geometry']))
            trees.append(STRtree(shp))
+   class_indices.append(0)
    print("Reading satellite data...")
    with rasterio.open(sat_path) as fullsat:
        sat_width = fullsat.width
@@ -102,11 +105,13 @@ def main(argv):
                index_max = max(range(len(areas)), key=areas.__getitem__)
                shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
                     + j) + ".tif", output_path + "/" + classnames[index_max] + "/"
-                    + classnames[index_max].lower()[:-1] + "." + str(round(width_tiles)*i + j) + ".tif")
+                    + classnames[index_max].lower()[:-1] + "." + str(class_indices[index_max]) + ".tif")
+               class_indices[index_max]+=1
            else:
                shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
                     + j) + ".tif", output_path + "/Untaggeds/untagged." +
-                    str(round(width_tiles)*i + j) + ".tif")
+                    str(class_indices[nr_of_classes]) + ".tif")
+               class_indices[nr_of_classes]+=1
            x += width
        y += height
        print(i)

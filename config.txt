@@ -4,9 +4,10 @@ Tile path = ../sthlm128px
 Tile prefix = sthlm128px
 Problemtype = binary
 Output path = Data/tagged data
-Classes: 6
+Classes: 7
 Residentials, filepath=Data/shapefiles/resipoly.shp
-Parks, filepath=Data/shapefiles/greenpoly.shp
+Parks, filepath=Data/shapefiles/parkpoly.shp
+Forests, filepath=Data/shapefiles/forestpoly.shp
 Commercials, filepath=Data/shapefiles/commercialpoly.shp
 Pitchs, filepath=Data/shapefiles/pitchpoly.shp
 Industrials, filepath=Data/shapefiles/industrialpoly.shp

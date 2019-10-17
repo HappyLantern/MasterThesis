@@ -1,9 +1,12 @@
-Source: C:/Users/A552081/MasterThesis/MSData/orig_data_test
-Destination: C:/Users/A552081/MasterThesis/MSData/test_for_generator
+Source: C:/Users/A552079/Documents/MasterThesis/Data/tagged data
+Destination: C:/Users/A552079/Documents/MasterThesis/Data/test_for_generator
 Splitratio: 60/20/20
-Classes: 4
-Houses
-Trees
-Parkinglots
+Classes: 8
+Residentials
+Commercials
+Forests
+Industrials
+Pitchs
+Parkings
 Parks
-
+Untaggeds
