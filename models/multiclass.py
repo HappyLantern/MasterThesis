@@ -5,7 +5,7 @@ from keras.applications import VGG16
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 import os, shutil
-
+import rasterio
 base_dir = '../Data/test_for_generator'
 
 train_dir = os.path.join(base_dir, 'train')
@@ -49,25 +49,28 @@ model.compile(optimizer=optimizers.RMSprop(lr=1e-4),
               loss='categorical_crossentropy',
               metrics=['acc'])
 
-train_datagen = ImageDataGenerator(
-      rescale=1./255)
+train_datagen = ImageDataGenerator(rescale=1./255)
+
+
 
 # Note that the validation data should not be augmented!
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
-        # This is therget directory
         train_dir,
         target_size=(128, 128),
-        batch_size=64,
-        class_mode='categorical')
+        color_mode = 'grayscale',
+        batch_size=1,
+        class_mode='binary')
 
 validation_generator = test_datagen.flow_from_directory(
-        validation_dir,
+        test_dir,
         target_size=(128, 128),
         batch_size=64,
         class_mode='categorical')
-
+for a,b in validation_generator:
+    print(a[0])
+"""
 history = model.fit_generator(
       train_generator,
       steps_per_epoch=360,
@@ -75,7 +78,7 @@ history = model.fit_generator(
       validation_data=validation_generator,
       validation_steps=50)
 
-# model.save('multiclass.h5')
+model.save('multiclass.h5')
 
 import matplotlib.pyplot as plt
 
@@ -99,3 +102,4 @@ plt.title('Training and validation loss')
 plt.legend()
 
 plt.show()
+"""
