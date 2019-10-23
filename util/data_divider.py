@@ -43,14 +43,14 @@ def main(argv):
       split_ratios = content[2][content[2].find(':') + 2 : - 1]
       split_ratios = re.split('/', split_ratios)
       split_ratios = [int(x) / 100 for x in split_ratios]
-       
+
       nbr_class = content[3][content[3].find(':') + 2 : -1]
       orig_data_dirs = {}
       train_dirs     = {}
       val_dirs       = {}
       test_dirs      = {}
 
-      data_classes = content[4 : 5 + int(nbr_class)][0 : -1]
+      data_classes = content[4 : 5 + int(nbr_class)]
       data_classes = [x[0 : -1] for x in data_classes] # Removing newline
       nbr_images   = {}
 
@@ -60,7 +60,7 @@ def main(argv):
          curr_train_dir = os.path.join(train_dir, data_class)
          curr_val_dir   = os.path.join(val_dir, data_class)
          curr_test_dir  = os.path.join(test_dir, data_class)
-      
+
          os.mkdir(curr_train_dir)
          os.mkdir(curr_val_dir)
          os.mkdir(curr_test_dir)
@@ -73,6 +73,7 @@ def main(argv):
          nbr_images[data_class] = len(os.listdir(os.path.join(orig_dir, data_class)))
 
       # Shuffle data
+      print("Shuffling images...")
       for data_class in data_classes:
 
          orig_fnames = os.listdir(orig_data_dirs[data_class]) # house.0, house.1, house.2
@@ -87,12 +88,13 @@ def main(argv):
          i = 0
          for fname in fnames:
             src = os.path.join(orig_data_dirs[data_class], fname) # Shuffled input
-            print(src)
+            #print(src)
             dst = os.path.join(orig_data_dirs[data_class], orig_fnames[i]) # Shuffled input set to house.0, house.1, etc. in order.
-            print(dst)
+            #print(dst)
             os.rename(src, dst)
             i += 1
 
+      print("Moving images...")
       for data_class in data_classes:
 
          train_range = int(split_ratios[0] * nbr_images[data_class])
@@ -106,13 +108,13 @@ def main(argv):
             src = os.path.join(orig_data_dirs[data_class], fname)
             dst = os.path.join(train_dirs[data_class], fname)
             shutil.copyfile(src, dst)
-         
+
          fnames = [filename + '.{}.tif'.format(i) for i in range(train_range, val_range)]
          for fname in fnames:
             src = os.path.join(orig_data_dirs[data_class], fname)
             dst = os.path.join(val_dirs[data_class], fname)
             shutil.copyfile(src, dst)
-         
+
          fnames = [filename + '.{}.tif'.format(i) for i in range(val_range, test_range)]
          for fname in fnames:
             src = os.path.join(orig_data_dirs[data_class], fname)

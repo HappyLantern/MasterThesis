@@ -71,7 +71,7 @@ def main(argv):
 
    width = (east-west)/width_tiles
    height = (south-north)/height_tiles
-                        # för sthlm
+                        # för sthlmrgb
                         # x-led 18.25367104 - 17.959218298 = 0.294452742
                         # 0.00188751758 per ruta
                         # y-led 59.362344447 - 59.234034854 = 0.128309593

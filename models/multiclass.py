@@ -51,32 +51,26 @@ model.compile(optimizer=optimizers.RMSprop(lr=1e-4),
 
 train_datagen = ImageDataGenerator(rescale=1./255)
 
-
-
 # Note that the validation data should not be augmented!
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
         train_dir,
         target_size=(128, 128),
-        color_mode = 'grayscale',
-        batch_size=1,
-        class_mode='binary')
+        batch_size=128,
+        class_mode='categorical')
 
 validation_generator = test_datagen.flow_from_directory(
-        test_dir,
+        validation_dir,
         target_size=(128, 128),
-        batch_size=64,
+        batch_size=128,
         class_mode='categorical')
-for a,b in validation_generator:
-    print(a[0])
-"""
 history = model.fit_generator(
       train_generator,
-      steps_per_epoch=360,
-      epochs=15,
+      steps_per_epoch=32,
+      epochs=30,
       validation_data=validation_generator,
-      validation_steps=50)
+      validation_steps=32)
 
 model.save('multiclass.h5')
 
@@ -102,4 +96,3 @@ plt.title('Training and validation loss')
 plt.legend()
 
 plt.show()
-"""

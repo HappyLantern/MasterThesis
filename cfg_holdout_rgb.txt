@@ -1,0 +1,12 @@
+Source: C:/Users/A552079/Documents/MasterThesis/Data/rgb tagged data
+Destination: C:/Users/A552079/Documents/MasterThesis/Data/test_for_generator_rgb
+Splitratio: 60/20/20
+Classes: 8
+Residentials
+Commercials
+Forests
+Industrials
+Untaggeds
+Parkings
+Parks
+Pitchs
