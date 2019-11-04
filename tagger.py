@@ -30,23 +30,33 @@ def main(argv):
        tile_pixels = lines[1][12:-1]
        tile_path = lines[2][12:-1]
        tile_prefix = lines[3][14:-1]
-       classtype = lines[4][14:-1]
-       output_path = lines[5][14:-1]
-       nr_of_classes = int(lines[6][9:-1])
+       tile_path_rgb = lines[4][16:-1]
+       tile_prefix_rgb = lines[5][19:-1]
+       output_path = lines[6][14:-1]
+       output_rgb = lines[7][13:-1]
+       nr_of_classes = int(lines[8][9:-1])
        print("Reading shapefiles...")
        trees = []
        classnames = []
        class_indices = []
+       if not os.path.isdir(output_path):
+           os.mkdir(output_path)
+       if not os.path.isdir(output_rgb):
+           os.mkdir(output_rgb)
        if not os.path.isdir(output_path+"/Untaggeds"):
            os.mkdir(output_path + "/Untaggeds")
+       if not os.path.isdir(output_rgb+"/Untaggeds"):
+           os.mkdir(output_rgb + "/Untaggeds")
        for i in range(nr_of_classes):
-           line = lines[7+i].split(',')
+           line = lines[9+i].split(',')
            class_indices.append(0)
            classname = line[0]
            classnames.append(classname)
            shape_path = line[1][10:-1]
            if not os.path.isdir(output_path+"/"+classname):
                os.mkdir(output_path+"/"+classname)
+           if not os.path.isdir(output_rgb+"/"+classname):
+               os.mkdir(output_rgb+"/"+classname)
            shp = []
            with collection(shape_path, "r") as input:
                for point in input:
@@ -106,10 +116,16 @@ def main(argv):
                shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
                     + j) + ".tif", output_path + "/" + classnames[index_max] + "/"
                     + classnames[index_max].lower()[:-1] + "." + str(class_indices[index_max]) + ".tif")
+               shutil.copyfile(tile_path_rgb + "/" + tile_prefix_rgb + "." + str(round(width_tiles)*i
+                    + j) + ".tif", output_rgb + "/" + classnames[index_max] + "/"
+                    + classnames[index_max].lower()[:-1] + "." + str(class_indices[index_max]) + ".tif")
                class_indices[index_max]+=1
            else:
                shutil.copyfile(tile_path + "/" + tile_prefix + "." + str(round(width_tiles)*i
                     + j) + ".tif", output_path + "/Untaggeds/untagged." +
+                    str(class_indices[nr_of_classes]) + ".tif")
+               shutil.copyfile(tile_path_rgb + "/" + tile_prefix_rgb + "." + str(round(width_tiles)*i
+                    + j) + ".tif", output_rgb + "/Untaggeds/untagged." +
                     str(class_indices[nr_of_classes]) + ".tif")
                class_indices[nr_of_classes]+=1
            x += width

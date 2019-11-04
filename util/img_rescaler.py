@@ -2,53 +2,34 @@ import numpy as np
 import os
 import rasterio
 import numpy as np
-base_dir = '../Data/test_for_generator'
+base_dir = '../Data/test_for_generator_rgb'
 
 train_dir = os.path.join(base_dir, 'train')
 test_dir = os.path.join(base_dir, 'test')
 validation_dir = os.path.join(base_dir, 'validation')
 
-print("rescaling training data...")
-for folder in os.listdir(train_dir):
-    print("at", folder)
-    for filename in os.listdir(train_dir+"/"+folder):
-        with rasterio.open(train_dir+"/"+folder+"/"+filename) as f:
-            profile = f.profile
+for dir in os.listdir(base_dir):
+    print("Rescaling "+dir+" folder...")
+    curr_dir = os.path.join(base_dir, dir)
 
-            a = f.read(1)
-            a = a/8
-            a = np.rint(a)
-            a = a.astype('uint8')
-            profile.update(dtype=rasterio.uint8, nodata=255.0)
-        with rasterio.open(train_dir+"/"+folder+"/"+filename, 'w', **profile) as g:
-            g.write(a, 1)
+    for folder in os.listdir(curr_dir):
+        print("at", folder)
+        curr_folder = os.path.join(curr_dir, folder)
 
-print("rescaling test data...")
-for folder in os.listdir(test_dir):
-    print("at", folder)
-    for filename in os.listdir(test_dir+"/"+folder):
-        with rasterio.open(test_dir+"/"+folder+"/"+filename) as f:
-            profile = f.profile
+        for filename in os.listdir(curr_dir):
+            if filename.endswith(".tif"):
+                curr_file = os.path.join(curr_folder, filename)
+                bands = []
+                with rasterio.open(curr_file) as f:
+                    profile = f.profile
 
-            a = f.read(1)
-            a = a/8
-            a = np.rint(a)
-            a = a.astype('uint8')
-            profile.update(dtype=rasterio.uint8, nodata=255.0)
-        with rasterio.open(test_dir+"/"+folder+"/"+filename, 'w', **profile) as g:
-            g.write(a, 1)
+                    for i in range(f.count):
+                        bands.append(f.read(i+1))
+                        bands[i] = bands[i]/8
+                        bands[i] = np.rint(bands[i])
+                        bands[i] = bands[i].astype('uint8')
 
-print("rescaling validation data...")
-for folder in os.listdir(validation_dir):
-    print("at", folder)
-    for filename in os.listdir(validation_dir+"/"+folder):
-        with rasterio.open(validation_dir+"/"+folder+"/"+filename) as f:
-            profile = f.profile
-
-            a = f.read(1)
-            a = a/8
-            a = np.rint(a)
-            a = a.astype('uint8')
-            profile.update(dtype=rasterio.uint8, nodata=255.0)
-        with rasterio.open(validation_dir+"/"+folder+"/"+filename, 'w', **profile) as g:
-            g.write(a, 1)
+                    profile.update(dtype=rasterio.uint8, nodata=255.0)
+                with rasterio.open(curr_file, 'w', **profile) as g:
+                    for i in range(len(bands)):
+                        g.write(bands[i], i+1)

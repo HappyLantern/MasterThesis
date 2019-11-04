@@ -1,14 +1,15 @@
 Satellite image = ../satellite images/sthlmgreynew.tif
 Tile size = 128
-Tile path = ../sthlm128px
+Tile path = ../tiles/sthlm128px
 Tile prefix = sthlm128px
-Problemtype = binary
+Tile rgb path = ../tiles/sthlmrgb32
+Tile prefix path = sthlmrgb32
 Output path = Data/tagged data
-Classes: 7
+Output rgb = Data/rgb tagged data
+Classes: 6
 Residentials, filepath=Data/shapefiles/resipoly.shp
 Parks, filepath=Data/shapefiles/parkpoly.shp
 Forests, filepath=Data/shapefiles/forestpoly.shp
 Commercials, filepath=Data/shapefiles/commercialpoly.shp
-Pitchs, filepath=Data/shapefiles/pitchpoly.shp
 Industrials, filepath=Data/shapefiles/industrialpoly.shp
 Parkings, filepath=Data/shapefiles/parkingpoly.shp
