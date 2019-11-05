@@ -1,2 +1,2 @@
 # ignores everything in data folder because we have >100000 images. Shapefiles etc are also ignored and maybe shouldn't be.
-Data
+Data/*
