@@ -76,9 +76,13 @@ def main(argv):
            east = coords[2][0]
            south = coords[1][1]
 
+   if sat_path == "../satellite images/washgreynew.tif":
+       west = -77.114237367
+       south = 38.880489803
+       east =  -76.999183819
+       north = 38.97260028
    width_tiles = sat_width/int(tile_pixels)
    height_tiles = sat_height/int(tile_pixels)
-
    width = (east-west)/width_tiles
    height = (south-north)/height_tiles
                         # för sthlmrgb
@@ -96,6 +100,7 @@ def main(argv):
            coords = [(x,y), (x,y+height), (x+width, y+height), (x+width, y), (x,y)]
            geom = {'type' : 'Polygon', 'coordinates': [coords]}
            tile = geometry.shape(geom)
+           #print(geom)
            areas = []
            has_class = 0
            for k in range(nr_of_classes):
@@ -132,18 +137,5 @@ def main(argv):
        y += height
        print(i)
 
-"""
-for shp in shapes[k]:
-   #intersect = shp.intersection(tile)
-   if not shp.disjoint(tile):# and intersect.area/shp.area > 0.5:
-       # kollar nu andelen av en viss parkeringsruta är i en tile
-       # borde kolla hur mycket av tilen är täckt, kanske?
-
-       # todo: flera olika shapes kan vara i samma tile, summera?
-       # Bestäm hur vi gör om flera klasser taggar samma tile.
-
-       has_class = 1
-       break
-"""
 if __name__ == "__main__":
    main(sys.argv[1:])

@@ -155,7 +155,7 @@ def main(argv):
             dst = os.path.join(val_dirs[data_class], fname)
             shutil.copyfile(src, dst)
             src_rgb = os.path.join(orig_data_dirs_rgb[data_class], fname)
-            dst_rgb = os.path.join(train_dirs_rgb[data_class], fname)
+            dst_rgb = os.path.join(val_dirs_rgb[data_class], fname)
             shutil.copyfile(src_rgb, dst_rgb)
 
          print("Test...")
@@ -165,7 +165,7 @@ def main(argv):
             dst = os.path.join(test_dirs[data_class], fname)
             shutil.copyfile(src, dst)
             src_rgb = os.path.join(orig_data_dirs_rgb[data_class], fname)
-            dst_rgb = os.path.join(train_dirs_rgb[data_class], fname)
+            dst_rgb = os.path.join(test_dirs_rgb[data_class], fname)
             shutil.copyfile(src_rgb, dst_rgb)
 
 if __name__ == "__main__":

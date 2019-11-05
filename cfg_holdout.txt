@@ -1,7 +1,7 @@
-Source: C:/Users/A552079/Documents/MasterThesis/Data/tagged data
-Source rgb: C:/Users/A552079/Documents/MasterThesis/Data/rgb tagged data
-Destination: C:/Users/A552079/Documents/MasterThesis/Data/test_for_generator
-Destination rgb: C:/Users/A552079/Documents/MasterThesis/Data/test_for_generator_rgb
+Source: C:/Users/A552079/Documents/MasterThesis/Data/tagged data_wash
+Source rgb: C:/Users/A552079/Documents/MasterThesis/Data/rgb tagged data_wash
+Destination: C:/Users/A552079/Documents/MasterThesis/Data/test_for_generator_wash
+Destination rgb: C:/Users/A552079/Documents/MasterThesis/Data/test_for_generator_rgb_wash
 Splitratio: 60/20/20
 Classes: 7
 Residentials

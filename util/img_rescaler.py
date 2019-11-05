@@ -2,11 +2,7 @@ import numpy as np
 import os
 import rasterio
 import numpy as np
-base_dir = '../Data/test_for_generator_rgb'
-
-train_dir = os.path.join(base_dir, 'train')
-test_dir = os.path.join(base_dir, 'test')
-validation_dir = os.path.join(base_dir, 'validation')
+base_dir = '../Data/test_for_generator_rgb_wash'
 
 for dir in os.listdir(base_dir):
     print("Rescaling "+dir+" folder...")
@@ -16,7 +12,8 @@ for dir in os.listdir(base_dir):
         print("at", folder)
         curr_folder = os.path.join(curr_dir, folder)
 
-        for filename in os.listdir(curr_dir):
+
+        for filename in os.listdir(curr_folder):
             if filename.endswith(".tif"):
                 curr_file = os.path.join(curr_folder, filename)
                 bands = []
