@@ -3,35 +3,36 @@ import rasterio as rio
 import matplotlib.pyplot as plt
 import os
 
-base_dir = '../Data/test_for_generator_rgb_wash'
+base_dir = '../Data/scaled data/test_for_generator_rgb_wash_scaled'
+gray_dir = '../Data/scaled data/test_for_generator_wash_scaled'
 
 for dir in os.listdir(base_dir):
-    print("Upscaling "+dir+" folder...")
+    print("\nUpscaling "+dir+" folder...")
     curr_dir = os.path.join(base_dir, dir)
 
     for folder in os.listdir(curr_dir):
         print("at", folder)
         curr_folder = os.path.join(curr_dir, folder)
-
+        
         for f in os.listdir(curr_folder):
             with rio.open(os.path.join(curr_folder,f)) as file:
+
                 profile = file.profile
+            
                 bands = []
                 upscale_factor = 4
-                for o in range(file.count):
+                for o in range(4): # file.count? But it has to be 4 for the model. wash has 8. 
                     band = file.read(o+1)
-                    new_band = np.zeros([band.shape[0] * upscale_factor, band.shape[1] * upscale_factor], dtype='uint8')
+                    # 32 is the band.shape[0] or 1, but hardcoded because we have not cleaned out edges with weird shapes
+                    # Right now, the edges get enlarged to 32,32 with 0 in the new values.
+                    new_band = np.zeros([32 * upscale_factor, 32 * upscale_factor], dtype='uint8')
                     band_x = 0
                     band_y = 0
                     new_band_x = 0
                     new_band_y = 0
-
-                    #print(band.shape)
-                    #print(new_band.shape)
-                    for i in range(band.shape[0] * band.shape[0]):
-                        #print(band_x, band_y)
-                        #print(new_band_x, new_band_y)
-                        #print(band[band_x][band_y])
+                
+                    
+                    for i in range(band.shape[0] * band.shape[1]):
 
                         for k in range(upscale_factor):
                             new_band[new_band_x][new_band_y + k]     = band[band_x, band_y]
@@ -54,17 +55,8 @@ for dir in os.listdir(base_dir):
 
                     bands.append(new_band)
 
-            with rio.open(os.path.join(path,f), 'w', **profile) as g:
+            with rio.open(os.path.join(gray_dir, dir, folder, f), 'w', driver ='GTiff',
+                            width=128, height=128, dtype='uint8', count=len(bands)+1) as g:
+
                 for i in range(len(bands)):
-                    #print(bands[i].shape[0], f)
-                    g.write(bands[i], i+1)
-
-"""
-print(new_band)
-
-f = plt.figure(1)
-plt.imshow(band)
-g = plt.figure(2)
-plt.imshow(new_band)
-plt.show()
-"""
+                    g.write(bands[i], i+2)
