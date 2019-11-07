@@ -3,8 +3,8 @@ import rasterio as rio
 import matplotlib.pyplot as plt
 import os
 
-base_dir = '../Data/scaled data/test_for_generator_rgb_wash_scaled'
-gray_dir = '../Data/scaled data/test_for_generator_wash_scaled'
+base_dir = '../Data/scaled data/test_for_generator_rgb_rio_scaled'
+gray_dir = '../Data/scaled data/test_for_generator_rio_scaled'
 
 for dir in os.listdir(base_dir):
     print("\nUpscaling "+dir+" folder...")

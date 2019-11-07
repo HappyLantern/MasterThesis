@@ -2,10 +2,10 @@ import numpy as np
 import os
 import rasterio
 import numpy as np
-base_dir = '../Data/test_for_generator_rgb_wash'
+base_dir = '../Data/test_for_generator_rgb_rio'
 
 for dir in os.listdir(base_dir):
-    print("Rescaling "+dir+" folder...")
+    print("\nRescaling "+dir+" folder...")
     curr_dir = os.path.join(base_dir, dir)
 
     for folder in os.listdir(curr_dir):
