@@ -22,6 +22,9 @@ class DataGenerator(keras.utils.Sequence):
 
     def __len__(self):
         'Denotes the number of batches per epoch'
+        print(len(self.data))
+        print(self.batch_size)
+        print(int(np.floor(len(self.data) / self.batch_size)))
         return int(np.floor(len(self.data) / self.batch_size))
 
     def __getitem__(self, index):
@@ -57,5 +60,6 @@ class DataGenerator(keras.utils.Sequence):
                                 
             images[i,] = image
             labels[i] = label # Maybe check if label is empty
+            #print(labels)
         
         return images, keras.utils.to_categorical(labels, num_classes=self.n_classes)

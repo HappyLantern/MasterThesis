@@ -1,77 +1,29 @@
 from keras import layers
 from keras import models
 from keras import optimizers
-from keras.applications import VGG16
+from ourVGG16 import ourVGG16
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 import os, shutil
 import rasterio
-base_dir = '../Data/test_for_generator'
+from data_generator import DataGenerator
 
-train_dir = os.path.join(base_dir, 'train')
-test_dir = os.path.join(base_dir, 'test')
-validation_dir = os.path.join(base_dir, 'validation')
 
-# Pre-Trained model - Data augmentation
 
-conv_base = VGG16(weights='imagenet',
-                  include_top=False,
-                  input_shape=(128, 128, 3))
-conv_base.trainable = True
-set_trainable = False
-for layer in conv_base.layers:
-    if layer.name == 'block5_conv1':
-        set_trainable = True
-    if set_trainable:
-        layer.trainable = True
-    else:
-        layer.trainable = False
-model = models.Sequential()
-model.add(conv_base)
-model.add(layers.Flatten())
-model.add(layers.Dense(7, activation='softmax'))
-"""
+base_dir = '../Data/vgg_data'
+classes = ['commercial', 'industrial', 'residential', 'parque', 'parking', 'forest']
+model = ourVGG16(len(classes), input_shape=(256, 256, 5))
 
-model = models.Sequential()
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 1)))
-model.add(layers.MaxPooling2D((2, 2)))
-
-model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-model.add(layers.MaxPooling2D((2, 2)))
-model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-model.add(layers.MaxPooling2D((2, 2)))
-model.add(layers.Flatten())
-model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(7, activation='softmax'))
-"""
-model.compile(optimizer=optimizers.RMSprop(lr=1e-4),
+model.compile(optimizer=optimizers.RMSprop(lr=1e-5),
               loss='categorical_crossentropy',
               metrics=['acc'])
 
-train_datagen = ImageDataGenerator(rescale=1./255)
+train_datagen = DataGenerator(base_dir, classes, n_channels=5, dim=(256,256))
 
-# Note that the validation data should not be augmented!
-test_datagen = ImageDataGenerator(rescale=1./255)
-
-train_generator = train_datagen.flow_from_directory(
-        train_dir,
-        target_size=(128, 128),
-        batch_size=128,
-        class_mode='categorical')
-
-validation_generator = test_datagen.flow_from_directory(
-        validation_dir,
-        target_size=(128, 128),
-        batch_size=128,
-        class_mode='categorical')
 history = model.fit_generator(
-      train_generator,
-      steps_per_epoch=32,
-      epochs=30,
-      validation_data=validation_generator,
-      validation_steps=32)
-
+      train_datagen,
+      epochs=30)
+"""
 model.save('multiclass.h5')
 
 import matplotlib.pyplot as plt
@@ -96,3 +48,4 @@ plt.title('Training and validation loss')
 plt.legend()
 
 plt.show()
+"""

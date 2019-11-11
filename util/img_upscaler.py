@@ -20,7 +20,7 @@ for dir in os.listdir(base_dir):
                 profile = file.profile
             
                 bands = []
-                upscale_factor = 4
+                upscale_factor = 2
                 for o in range(4): # file.count? But it has to be 4 for the model. wash has 8. 
                     band = file.read(o+1)
                     # 32 is the band.shape[0] or 1, but hardcoded because we have not cleaned out edges with weird shapes
