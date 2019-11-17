@@ -15,6 +15,8 @@ class ModelBuilder():
         self.model = None
         if self.model_name == 'vgg16':
             self.model = nn_models.VGG16_Model(len(self.classes), self.input_shape)
+        if self.model_name == 'vgg16bn':
+            self.model = nn_models.VGG16_BN(len(self.classes), self.input_shape)
         if self.model_name == 'vgg19':
             self.model = nn_models.VGG19_Model(len(self.classes), self.input_shape)
         if self.model_name == 'xception':
@@ -59,6 +61,10 @@ class ModelBuilder():
             self.model.compile(optimizer=optimizers.SGD(learning_rate, momentum=0.9),
                                loss=loss,
                                metrics=metrics)
+            
+    def predict(self, test_gen, steps):
+        predictions = self.model.predict_generator(test_gen, steps, verbose=1)
+        return predictions
 
     def fit_model(self, train_gen, val_gen, callbacks, epochs=30, steps_per_epoch=50, val_steps_per_epoch=50):
         'Fits model, returns training history'
@@ -75,6 +81,14 @@ class ModelBuilder():
 
     def print_model(self):
         pass
+    
+    def evaluate(self, test_gen, steps):
+        scores = self.model.evaluate_generator(test_gen,
+                            steps=steps, verbose=1)
+        return scores
+    
+    def load_weights(self, weights):
+        self.model.load_weights(weights)
 
     def save_model(self):
         
@@ -84,12 +98,5 @@ class ModelBuilder():
 
     def print_summary(self):
         self.model.summary()
-
-
-
-
-
-
-
 
 
